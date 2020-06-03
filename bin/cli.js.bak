@@ -1,0 +1,103 @@
+#!/usr/bin/env node
+
+
+//核心处理命令行
+
+const program = require("commander");
+const printer = require("@darkobits/lolcatjs");
+const config = require("./config.js");
+const shelljs = require("shelljs");
+const chalk = require("chalk");
+const inquirer = require("inquirer");
+const download = require("download-git-repo");
+const ora = require("ora");
+const userHome = require("user-home");
+
+console.log(userHome,__dirname);
+
+const template = "direct:https://github.com/yitiaoxianyu0927/webpack-mpa.git"
+
+
+program.version(printer.default.fromString(`${config.greet}\n0.0.1`),"-v, --version");
+
+
+// program.command("init","初始化项目");
+const binHandler = {
+    
+    async init(){
+
+        const { repo } = await inquirer
+        .prompt([
+            {
+                type:"text",
+                message:"请输入文件夹的名字",
+                name:"projectName"
+            },
+            {
+               type:"list",
+               message:"请选择对应语言",
+               choices:["✔ TypeScript","✔ EcmaScript"],
+               name:"kind"
+            }
+        ])
+        .then(answers => {
+
+            const projectName = answers.projectName;
+            
+            if(projectName) {
+
+                const spinner = ora("🔥 下载初始化模板...");
+                spinner.start();
+                //下载github项目
+
+                const __dirname = "E:/development/project/npm-group/webpack-test"
+
+                const _projectPath = `${__dirname}/${projectName}`
+                shelljs.cd(__dirname)
+                shelljs.rm("-rf",_projectPath);
+                shelljs.mkdir(projectName);
+
+                //if(error)
+
+                await download(template, _projectPath , { clone:true } , err => {
+                    
+                    spinner.stop();
+
+                    if(err){
+
+                       console.error("😥 下载失败",err.message.trim());
+
+                    }else{
+                       
+                       shelljs.sed("-i","ytxy-webpack-mpa",projectName,_projectPath+"/package.json") 
+                       console.log(chalk.green("👻 项目创建成功~")) 
+
+                    }
+                })
+            }
+
+        })
+
+
+        console.log("repo",repo);
+    }
+}
+program
+    .usage("[cmd] <option>")
+    .arguments("<cmd> [env]")
+    .action((cmd, otherParms) => {
+
+        const handler = binHandler[cmd];
+        if(handler){
+
+            handler();
+        
+        }else{
+
+            console.log(`${chalk.yellow("非常遗憾")} 【${chalk.red(cmd)}】命令并不存在`);
+
+        }
+
+    })
+
+program.parse(process.argv);
