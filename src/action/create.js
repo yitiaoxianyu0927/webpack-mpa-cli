@@ -15,7 +15,8 @@ download = promisify(download); //把回调函数改成异步promise
 
 const RepoList =  {
    
-    "webpack-mpa":"direct:https://github.com/yitiaoxianyu0927/webpack-mpa.git"
+    "webpack-mpa":"direct:https://github.com/yitiaoxianyu0927/webpack-mpa.git",
+    "ytxy-mirco-system":"direct:https://github.com/yitiaoxianyu0927/ytxy-micro-system.git"
 
 }
 
